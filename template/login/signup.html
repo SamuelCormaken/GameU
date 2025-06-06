@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup</title>
+  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet" />
+  <style>
+    * {
+      font-family: "Gilroy", sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      color: aliceblue;
+    }
+    body {
+      background: linear-gradient(to right, #08040f, #170a1c, #230f19, #3a0303);
+      background-attachment: fixed;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .right-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-container {
+      background-color: rgba(71, 67, 67, 0.254);
+      padding: 30px 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      width: 100%;
+    }
+
+    .message h1 {
+      font-size: 1.75em;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #E2E2E2;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    form label {
+      margin-bottom: 5px;
+      font-size: 1em;
+    }
+
+    form input,
+    form select {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #E8E8E8;
+      border-radius: 10px;
+      color: #97A5B7;
+      font-size: 1em;
+    }
+
+    form input::placeholder {
+      color: #ccc;
+    }
+
+    .submit-btn {
+      background-color: #1768be;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #0e4887;
+    }
+
+    form p {
+      text-align: center;
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
+
+    form p a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    form p a:hover {
+      text-decoration: underline;
+    }
+    form select option{
+      color: #08040f;
+      background-color: aliceblue;
+    }
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 25px 20px;
+      }
+
+      .message h1 {
+        font-size: 1.5em;
+      }
+
+      .submit-btn {
+        padding: 10px;
+        font-size: 0.95em;
+      }
+
+      form label,
+      form input,
+      form select {
+        font-size: 0.95em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 20px 15px;
+        border-radius: 15px;
+      }
+
+      .message h1 {
+        font-size: 1.3em;
+      }
+
+      form input,
+      form select {
+        padding: 8px;
+        font-size: 0.9em;
+      }
+
+      .submit-btn {
+        font-size: 0.9em;
+        padding: 10px;
+      }
+
+      form p {
+        font-size: 0.85em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="right-section">
+    <div class="form-container">
+      <div class="message">
+        <h1>Create Your Account</h1>
+      </div>
+      <form method="POST" action="{% url 'signup' %}">
+        {% csrf_token %}
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required />
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+        <label for="role">Select Role</label>
+        <select id="role" name="role" required>
+          <option value="">-- Choose your role --</option>
+          <option value="admin">Admin</option>
+          <option value="user">Normal User</option>
+          <option value="organizer">Event Organizer</option>
+        </select>
+
+        <button type="submit" class="submit-btn">Sign Up</button>
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

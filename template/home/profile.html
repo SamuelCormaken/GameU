@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ profile_user.profile.image.url }}'s Profile</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="container">
+      <a href="{% url 'home' %}">
+        <h2 class="logo">Gameverse</h2>
+      </a>
+
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main>
+    <div class="container">
+      <!-- Left Sidebar -->
+      <div class="left">
+
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+          <a class="menu-item active"><span><i class="uil uil-user"></i></span>
+            <h3>Profile</h3>
+          </a>
+          <a href="{% url 'logout' %}" class="menu-item"><span><i class="uil uil-signout"></i></span>
+            <h3>Logout</h3>
+          </a>
+        </div>
+      </div>
+
+      <!-- Middle Content -->
+      <div class="middle">
+        <!-- Profile Card -->
+        <div class="profile-card" style="
+              background: var(--color-white);
+              padding: 2rem;
+              border-radius: var(--card-border-radius);
+              box-shadow: var(--card-shadow);
+            ">
+          <div style="display: flex; align-items: center; gap: 1.5rem">
+            {% if user_profile.image %}
+    <img src="{{ user_profile.image.url }}" alt="Profile" width="150" height="150">
+{% else %}
+    <img src="{% static 'img/default.jpg' %}" alt="Default" width="150" height="150">
+{% endif %}
+
+
+            <div>
+              <h2>{{ user_profile.user.username }}'s Profile</h2>
+              <br />
+            </div>
+          </div>
+          <hr style="margin: 1.5rem 0; border-color: var(--color-light)" />
+          <div style="line-height: 1.8">
+            <p>
+              <strong>Email:</strong>
+              <span class="text-muted">{{ user_profile.user.email }}</span>
+            </p>
+            <p>
+              <br>
+
+            <div class="create">
+              <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit</a>
+            </div>
+          </div>
+        </div>
+        <!-- Right Sidebar (Optional) -->
+      </div>
+  </main>
+</body>
+
+</html>

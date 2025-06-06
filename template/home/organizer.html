@@ -1,0 +1,237 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organizer Posts - Gameverse</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css" />
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="container">
+      <h2 class="log">Gameverse</h2>
+      <div class="create">
+        <label class="btn btn-primary" for="create-post">Create</label>
+        <div class="profile-picture"><img src="" alt="" /></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main>
+    <div class="container">
+      <!-- Sidebar -->
+      <div class="left">
+        <a class="profile" href="{% url 'profile' %}">
+          {% if user.profile.image %}
+              <img src="{{ user.profile.image.url }}" alt="Profile" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+          {% else %}
+              <img src="{% static 'img/default.jpg' %}" alt="Default" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+          {% endif %}
+          <div class="handle">
+              <h4>{{ user.username }}</h4>
+          </div>
+      </a>
+
+        <div class="sidebar">
+          <a class="menu-item" href="{% url 'home' %}">
+            <span><i class="uil uil-home"></i></span>
+            <h3>Home</h3>
+          </a>
+          <a class="menu-item active">
+            <span><i class="uil uil-compass"></i></span>
+            <h3>Organizer</h3>
+          </a>
+          <a class="menu-item" href="{% url 'resources' %}">
+            <span><i class="uil uil-bookmark"></i></i></span>
+            <h3>Resources</h3>
+          </a>
+          <a class="menu-item" id="theme">
+            <span><i class="uil uil-palette"></i></span>
+            <h3>Theme</h3>
+          </a>
+        </div>
+      </div>
+
+      <!-- Middle Section -->
+      <div class="middle">
+        <h2>OrganizerPosts</h2>
+
+        <!-- Create Post Form -->
+        <h3>Create General Post</h3>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ post_form.as_p }}
+          <input type="hidden" name="post_type" value="image">
+          <button type="submit" class="btn btn-primary">Post Image</button>
+        </form>
+
+        <h3>Create Tournament Form</h3>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ tournament_form.as_p }}
+          <input type="hidden" name="post_type" value="tournament">
+          <button type="submit" class="btn btn-primary">Post Tournament Form</button>
+        </form>
+
+        <!-- Posts Feed -->
+        <div class="feeds">
+
+          <!-- Image Posts -->
+          {% for post in posts %}
+          <div class="feed">
+            <div class="head">
+              <div class="user">
+                <div class="profile-picture">
+                  {% if post.user.profile.image %}
+                      <img src="{{ post.user.profile.image.url }}" alt="Profile" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                  {% else %}
+                      <img src="{% static 'img/default.jpg' %}" alt="Default" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                  {% endif %}
+              </div>
+
+                <div class="ingo">
+                  <h3>{{ post.user.username }}</h3>
+                  <small>{{ post.timestamp|date:"F j, Y" }}</small>
+                </div>
+              </div>
+            </div>
+
+            {% if post.image %}
+            <div class="photo">
+              <img src="{{ post.image.url }}" alt="Post Image">
+            </div>
+            {% endif %}
+
+            <div class="caption">
+              {% if post.description %}
+              <p><b>{{ post.user.username }}</b> {{ post.description }}</p>
+              {% endif %}
+            </div>
+          </div>
+          <!-- buttons -->
+          {% if post.user == request.user %}
+            <a href="{% url 'organizer_edit_post' post.id %}" class="btn">Edit</a>
+            <a href="{% url 'organizer_delete_post' post.id %}" class="btn btn-danger">Delete</a>
+          {% endif %}
+
+          {% endfor %}
+
+         <!-- Tournament Form Posts -->
+<!-- Tournament Form Posts -->
+{% for tform in tournament_posts %}
+<div class="feed">
+    <div class="head">
+        <div class="user">
+            <div class="profile-picture">
+                {% if tform.organizer.profile.image %}
+                <img src="{{ tform.organizer.profile.image.url }}" alt="" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;"/>
+                {% else %}
+                <img src="{% static 'images/default.jpg' %}" alt="" />
+                {% endif %}
+            </div>
+            <div class="info">
+                <h3>{{ tform.organizer.username }}</h3>
+                <!-- buttons -->
+            {% if tform.organizer == request.user %}
+            <a href="{% url 'organizer_edit_tournament' tform.id %}" class="btn">Edit</a>
+            <a href="{% url 'organizer_delete_tournament' tform.id %}" class="btn btn-danger">Delete</a>
+          {% endif %}
+
+                <small>Form Post • {{ tform.created_at|date:"F j, Y" }}</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="caption">
+        <p><b>{{ tform.title }}</b> - {{ tform.description }}</p>
+        <p><b>Players per Team:</b> {{ tform.num_players_per_team }}</p>
+        <p><b>Fields Required:</b></p>
+        <ul>
+            {% for field in tform.fields_required %}
+            <li>{{ field }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% if request.user.profile.role == 'user' %}
+    <!-- Registration form for normal user -->
+    <div class="caption">
+        <form method="POST" action="{% url 'submit_tournament_form' tform.id %}">
+            {% csrf_token %}
+            {% for i in tform.num_players_per_team|to %}
+                <h4>Player {{ i }}</h4>
+                {% for field in tform.fields_required %}
+                    <label>{{ field }}:</label>
+                    <input type="text" name="player_{{ i }}_{{ field }}" required><br>
+                {% endfor %}
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Submit Registration</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if request.user == tform.organizer %}
+    <!-- Organizer sees registrations for their form -->
+    <div class="caption">
+        <h4>Registrations for this tournament:</h4>
+        {% with tform.tournamentregistration_set.all as registrations %}
+            {% if registrations %}
+                {% for reg in registrations %}
+                    <div class="registration-block">
+                        <p><strong>Registered by:</strong> {{ reg.user.username }}</p>
+                        <ul>
+                            {% for player, pdata in reg.data.items %}
+                                <li><strong>{{ player }}</strong>
+                                    <ul>
+                                        {% for field, value in pdata.items %}
+                                            <li>{{ field }}: {{ value }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p><small>Submitted on {{ reg.submitted_at|date:"F j, Y, g:i a" }}</small></p>
+                        <hr>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No registrations yet.</p>
+            {% endif %}
+        {% endwith %}
+    </div>
+    {% endif %}
+    
+
+</div>
+{% endfor %}
+
+
+          
+      
+
+
+        </div>
+      </div>
+
+      <div class="right"></div>
+    </div>
+  </main>
+
+  <div class="customize-theme">
+    <div class="card">
+      <h2>Customize Your View</h2>
+      <p>Manage your font size, color and background</p>
+    </div>
+  </div>
+
+  <script src="{% static 'js/script.js' %}"></script>
+</body>
+
+</html>

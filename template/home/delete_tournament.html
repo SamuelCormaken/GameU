@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Delete Tournament Form</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <nav><a href="{% url 'organizer' %}" class="btn">Back to Organizer</a></nav>
+  <main class="container">
+    <h2>Confirm Deletion</h2>
+    <p><strong>Title:</strong> {{ form_post.title }}</p>
+    <p><strong>Description:</strong> {{ form_post.description }}</p>
+
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      <a href="{% url 'organizer' %}" class="btn">Cancel</a>
+    </form>
+  </main>
+</body>
+</html>

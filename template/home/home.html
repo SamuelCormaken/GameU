@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gameverse</title>
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+
+</head>
+
+<body>
+    <nav>
+        <div class="container">
+            <h2 class="log">
+                Gameverse
+            </h2>
+
+            <div class="create">
+                <div id="create-post-button" class="btn btn-primary">Create</div>
+                <div class="profile-picture">
+                    <img src="" alt="">
+                </div>
+            </div>
+
+        </div>
+    </nav>
+    <!-------------------------- main ------------------------------>
+    <main>
+        <div class="container">
+            <!-- left -->
+            <div class="left">
+                <a class="profile" href="{% url 'profile' %}">
+                    <div class="profile-pictur">
+                  {% if user.profile.image %}
+                    <img src="{{ user.profile.image.url }}" alt="Profile" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                {% else %}
+                    <img src="{% static 'img/default.jpg' %}" alt="Default" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                {% endif %}
+
+                    </div>
+                    <div class="handle">
+                        <h4>{{ user.username }}</h4>
+                    </div>
+                </a>
+                <!-- sidebar -->
+                <div class="sidebar">
+                    <a class="menu-item active">
+                        <span><i class="uil uil-home"></i></span>
+                        <h3>Home</h3>
+                    </a>
+                    <a href="http://127.0.0.1:8000/organizer/" class="menu-item">
+                        <span><i class="uil uil-compass"></i></span>
+                        <h3>Organizer</h3>
+                    </a>
+
+                    <a href="{% url 'resources' %}" class="menu-item">
+                        <span><i class="uil uil-bookmark"></i></i></span>
+                        <h3>Resources</h3>
+                    </a>
+                    <a class="menu-item" id="theme">
+                        <span><i class="uil uil-palette"></i></i></span>
+                        <h3>Theme</h3>
+                    </a>
+
+
+                </div>
+
+                <!-- End of leftside -->
+
+            </div>
+            <!-- middle -->
+            <div class="middle">
+               <!-- ---------------------- feed ---------------------- -->
+<div class="feeds">
+    <!-- Post Upload Form -->
+    <form method="POST" enctype="multipart/form-data" style="margin-bottom: 2rem;">
+        {% csrf_token %}
+        {{ post_form.as_p }}
+        <button type="submit">Post</button>
+    </form>
+    
+
+    {% for p in post %}
+    <div class="feed">
+        <div class="head">
+            <div class="user">
+              <div class="profile-picture">
+                {% if p.user.profile.image %}
+                    <img src="{{ p.user.profile.image.url }}" alt="Profile" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                {% else %}
+                    <img src="{% static 'img/default.jpg' %}" alt="Default" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                {% endif %}
+            </div>
+
+
+                <div class="ingo">
+                    <h3>{{ p.user.username }}</h3>
+                    <small>{{ p.timestamp }}</small>
+                </div>
+                <span class="edit"><i class="uil uil-ellipsis-h"></i></span>
+            </div>
+        </div>
+
+        {% if p.image %}
+        <div class="photo">
+            <img src="{{ p.image.url }}" alt="Post Image">
+        </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <div class="interaction-buttons">
+                <form method="POST" action="{% url 'home' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="post_id" value="{{ p.id }}">
+                    <button type="submit" name="like_post" style="background: none; border: none;">
+                        {% if user in p.likes.all %}
+                            <i class="uil uil-heart" style="color: red;"></i>
+                        {% else %}
+                            <i class="uil uil-heart"></i>
+                        {% endif %}
+                    </button>
+                </form>
+                <span><i class="uil uil-comment-alt"></i></span>
+                <span><i class="uil uil-share"></i></span>
+            </div>
+            <div class="bookmarks">
+                <span><i class="uil uil-bookmark"></i></span>
+            </div>
+        </div>
+
+        <div class="liked-by">
+            {% if p.likes.first %}
+            Liked by <b>{{ p.likes.first.username }}</b>
+            {% else %}
+                No likes yet
+             {% endif %}
+        </div>
+
+        <div class="caption">
+            <p><b>{{ p.user.username }}</b> {{ p.description }} <span class="hash-tag">#gaming</span></p>
+        </div>
+        {% if p.can_edit %}
+            <div class="post-actions">
+                <a href="{% url 'edit_post' p.id %}" class="btn btn-primary">Edit</a>
+                <a href="{% url 'delete_post' p.id %}" class="btn btn-danger">Delete</a>
+            </div>
+        {% endif %}
+
+
+        <div class="comments-section">
+            <h5>Comments:</h5>
+            <ul>
+                {% for comment in p.comment_set.all %}
+                <li>
+                    <strong>{{ comment.user.username }}</strong>: {{ comment.contents }}<br>
+                    <small>{{ comment.timestamp }}</small>
+                </li>
+                {% empty %}
+                <li>No comments yet.</li>
+                {% endfor %}
+            </ul>
+
+            <form method="POST" action="{% url 'home' %}">
+                {% csrf_token %}
+                <input type="hidden" name="post_id" value="{{ p.id }}">
+                <textarea name="contents" placeholder="Add a comment..." rows="1" required></textarea>
+                <button type="submit">Comment</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+            <!------------- END OF MIDDLE SECTION ----------------->
+
+            <!-- right -->
+            <!-- <div class="right">
+                <div class="messages">
+                    <div class="heading">
+                        <h4>Messages</h4><i class="uil uil-edit"></i>
+                    </div>
+                    <div class="search-bar">
+                        <i class="uil uil-search"></i>
+                        <input type="search" placeholder="Search messages" id="mesasge-search">
+                    </div>
+                    <div class="category">
+                        <h6 class="active">Primary</h6>
+                        <h6>General</h6>
+                        <h6 class="message-requests">Request(7)</h6>
+                    </div>
+                    <div class="message">
+                        <div class="profile-picture">
+                            <img src="" alt="">
+                        </div>
+                        <div class="message-body">
+                            <h5>Edem QUist</h5>
+                            <P class="text-muted">Just woke up bruh</P>
+                        </div>
+                    </div>
+                </div>
+                <div class="friend-requests">
+                    <h4>Requests</h4>
+                    <div class="request">
+                        <div class="info">
+                            <div class="profile-picture">
+                                <img src="" alt="">
+                            </div>
+                            <div>
+                                <h5>Sarjil Hasan</h5>
+                                <p class="text-muted">
+                                    8 mutual friends
+                                </p>
+
+                            </div>
+                        </div>
+                        <div class="action">
+                            <button class="btn btn-primary">Accept</button>
+                            <button class="btn">Decline</button>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div> -->
+        </div>
+    </main>
+    <div class="customize-theme">
+        <div class="card">
+            <h2>Customize Your View</h2>
+            <p>Manage your font size, color and backgroud</p>
+            <!-- FONT SIZES -->
+            <div class="font-size">
+                <h4>Font Size</h4>
+                <div>
+                    <h6>Aa</h6>
+                    <div class="choose-size">
+                        <span class="font-size-1"></span>
+                        <span class="font-size-2 active"></span>
+                        <span class="font-size-3"></span>
+                        <span class="font-size-4"></span>
+                        <span class="font-size-5"></span>
+                    </div>
+                    <h3>Aa</h3>
+                </div>
+            </div>
+            <!-- PRIMARY COLOR -->
+            <div class="color">
+                <h4>Color</h4>
+                <div class="choose-color">
+                    <span class="color-1 active"></span>
+                    <span class="color-2"></span>
+                    <span class="color-3"></span>
+                    <span class="color-4"></span>
+                    <span class="color-5"></span>
+
+                </div>
+
+            </div>
+            <!-- BACKGROUD COLOUR -->
+            <div class="background">
+                <h4>Backgroud</h4>
+                <div class="choose-bg">
+                    <div class="bg-1 active">
+                        <span></span>
+                        <h5 for="bg-1">Light</h5>
+                    </div>
+                    <div class="bg-2">
+                        <span></span>
+                        <h5 for="bg-2">Dim</h5>
+                    </div>
+                    <div class="bg-3">
+                        <span></span>
+                        <h5 for="bg-3">Light Outs</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+
+</body>
+
+</html>
